@@ -1,0 +1,40 @@
+{
+  "name": "weather-app",
+  "version": "1.0.0",
+  "description": "simple weather app that displays the actual weather of a given city through the prompt",
+  "main": "app.js",
+  "type": "module",
+
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node App.js",
+    "weather-app": "npm start"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DamianMontoya/Nodejs-projects.git"
+  },
+  "keywords": [
+    "Nodejs",
+    "Axios",
+    "Chalk",
+    "Inquirer",
+    "Prompt",
+    "Weather-app"
+  ],
+  "author": "Damian Montoya",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/DamianMontoya/Nodejs-projects/issues"
+  },
+  "homepage": "https://github.com/DamianMontoya/Nodejs-projects#readme",
+  "dependencies": {
+    "axios": "^1.6.2",
+    "chalk": "^5.3.0",
+    "inquirer": "^9.2.12"
+  },
+  "devDependencies": {
+    "dotenv": "^16.3.1",
+    "nodemon": "^3.0.1"
+  }
+}
