@@ -63,7 +63,7 @@ async function askCity ()
         {
             if(!city)
             {
-                console.log('You must enter a city');
+                console.log('You must enter a valid city');
             }
             return true;
         }
