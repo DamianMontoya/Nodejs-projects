@@ -1,0 +1,17 @@
+/*
+    Que funcione el esqueleto del programa y permita pasar todas las pantallas
+
+    Añadir base de datos de las ciudades
+
+    Que devuelva el clima de las ciudades
+
+    Programacion defensiva, capar todo
+
+    Añadir base de datos de clientes, que loogen y volcado de datos en bd
+    
+    Hacer un CRUD basico
+
+    Que funcione todo de nuvo
+
+    Testing
+*/
