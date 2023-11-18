@@ -15,3 +15,13 @@
 
     Testing
 */
+
+
+Como hago para pasar de la pantalla de logIn a la siguiente
+
+ show menu pero con la data del usuario para que vea su propio historial
+
+Como hacer el volado masivo de datos a la db para los municipios.
+
+Como arrastrar la info del usuario del login al la pantalla del usuario
+
