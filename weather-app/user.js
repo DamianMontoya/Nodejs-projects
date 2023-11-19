@@ -1,12 +1,12 @@
 import inquirer from 'inquirer';
-import { createUser, findUserByEmail } from './models/User.js';
+import { createUser, findUserByEmail, updateUserEmail, updateUserName, findUserById, updateUserPassword, deleteUser } from './models/User.js';
 import chalk  from 'chalk';
 
 let currentUser = null
 
 async function logInSignUp ()
 {
-
+    console.clear();
     const signInSignUp = await inquirer.prompt([
         {
             type: 'list',
@@ -37,11 +37,15 @@ async function logIn ()
     ])
 
     currentUser = await findUserByEmail(email);
-
+    
+    //console.log('WARNING, THIS IS THE USER INFO', currentUser);
+    //console.log('WARNING, THIS SHOULD BE THE ID', currentUser._id);
+    //console.log('WARNING, THIS SHOULD BE JUST THE ID NUM ', currentUser._id.toHexString())
+    
     if(currentUser !== null && currentUser.password === password)
     {
       console.log('Welcome ', currentUser.userName);
-      showUserMenu();
+      showUserMainMenu();
     }
     else
     {
@@ -88,10 +92,11 @@ async function signUp()
 };
 
 // MANEJAR LA ELECCION DEL USUARIO
-async function showUserMenu() 
+async function showUserMainMenu() 
 {
-    console.log("-------------------- USER MENU")
-   const userResponse = await inquirer.prompt([
+    //console.clear();
+    console.log(chalk.bgGreen('------------- MENU-------------'));
+    const userResponse = await inquirer.prompt([
     {
       type: 'list',
       name: 'choice',
@@ -99,17 +104,16 @@ async function showUserMenu()
       choices: [
         { value: 'weather', name: chalk.cyan('1. Search weather') },
         { value: 'history', name: chalk.cyan('2. Searching history') },
-        {value: 'userProfile', name: chalk.cyan('3. View my profile')},
+        {value: 'userProfile', name: chalk.cyan('3. View and change my profile')},
         { value: 'exit', name: chalk.red('4. Exit') }],
     }
     ])
     
-    handleUserChoice(userResponse.choice);
-    
+    userMainMenuHandler(userResponse.choice);   
 };
 
 
-function User(choice) 
+function userMainMenuHandler(choice) 
 {
   switch (choice) 
   {
@@ -124,18 +128,21 @@ function User(choice)
     
     case 'userProfile':
         console.log(chalk.yellow('Searching user info...'));
+        showUserProfileMenu();
         break
     case 'exit':
         console.log(chalk.red('Exiting...'));
         process.exit(1);
     default:
       console.log(chalk.red('Invalid choice. Please try again.'));
-      showUserMenu();
+      showUserMainMenu();
   };
 };
 
-async function displayUserInfo()
+async function showUserProfileMenu()
 {
+  console.clear();
+  console.log(chalk.whiteBright(`Hi ${currentUser.userName}, your current email is ${currentUser.email}, what do you want to do?`))
   const userChoice = await inquirer.prompt([
     {
         type: 'list',
@@ -144,51 +151,112 @@ async function displayUserInfo()
         choices: [
             { value: 'ChangePassword', name: chalk.cyan('1. Change password') },
             { value: 'ChangeEmail', name: chalk.cyan('2. Change email') },
-            { value: 'ChangeUserName', name: chalk.cyan('2. Change userName') },
-            { value: 'menu', name: chalk.red('4. Go to the menu') }],
+            { value: 'ChangeUserName', name: chalk.cyan('3. Change userName') },
+            {value: 'DeleteUser', name: chalk.cyan('4. Delete my profile') },
+            { value: 'menu', name: chalk.red('5. Go back to the main menu') }]
     }
     ])
-        handleUserProfileChoice(userChoice.choice);
+        userProfileMenuHandler(userChoice.choice);
 };
 
-function handleUserProfileChoice(choice) 
+
+// DEBERIA SACAR LA LOGICA FUERA DEL CASE Y CREAR UNA FUNCION PARA QUE SEA MÁS LIMPIA  aunque ya tenga una query para esto sin el prompt? nomenclatura duplicada¿?
+// SI NO PONGO console.clear() antes de cada inicio de case se duplica el mensaje del inquirer.prompt- POR QUÉ
+// ESTA FUNCION ES ENORME, PINTA FEO, HAY QUE REFACTORIZAR
+async function userProfileMenuHandler(choice) 
 {
     switch (choice) 
     {
     case 'ChangePassword':
         console.clear();
-        console.log(chalk.yellow('Changing password...'));
-        displayData();
+        const { newPassword } = await inquirer.prompt([
+          {
+             type: 'input',
+             name: 'newEmail',
+             message: chalk.yellow('Enter your new password: '),
+          }
+         ]);
+         await updateUserPassword(currentUser._id, newPassword);
+         currentUser = await findUserById(currentUser._id);
+         showUserProfileMenu();
+         {
+
+         }
         break;
 
     case 'ChangeEmail':
-        console.log(chalk.yellow('Changing email...'));
+        console.clear();
+        const { newEmail } = await inquirer.prompt([
+         {
+            type: 'input',
+            name: 'newEmail',
+            message: chalk.yellow('Enter your new email: '),
+         }
+        ]);
+        
+        await updateUserEmail(currentUser._id, newEmail);
+        currentUser = await findUserById(currentUser._id);
+        showUserProfileMenu();
         break;  
+
     case 'ChangeUserName':
-        console.log(chalk.red('Changing name...'));
-        process.exit(1);
-        break
+        console.clear();
+        const { newUserName } = await inquirer.prompt([
+          {
+            type: 'input',
+            name: 'newUserName',
+            message: chalk.yellow('Enter your new user name: '),
+          }
+        ]);
+        await updateUserName(currentUser._id, newUserName);
+        // con esto actualizas los datos cada vez que se haga un update
+        currentUser = await findUserById(currentUser._id);
+        showUserProfileMenu();
+        break;
+
+    case 'DeleteUser':
+      console.clear();
+      const { deleteConfirmation } = await inquirer.prompt([
+        {
+          type: 'input',
+          name: 'deleteConfirmation',
+          message: chalk.yellow("Are sure you want to delete profile? Type 'yes' to delete and 'no' to exit: "),
+          validate(deleteConfirmation)
+          {
+              if(deleteConfirmation !== 'yes' || deleteConfirmation !== 'no')
+              {
+                  console.clear();
+                  console.log("You must type 'yes' to delete and 'no' to exit");
+                  return false;
+                }
+              return true;
+          },
+        }
+      ]);
+
+      if(deleteConfirmation === 'yes')
+      {
+        await deleteUser(currentUser._id);
+        console.clean();
+        console.log(chalk.red('Your profile has been deleted'));
+        await signUp();
+      }
+      else
+      {
+        showUserProfileMenu();
+      };
+      break;
     case 'menu':
-        console.log(chalk.red('Exiting...'));
-        process.exit(1);
-        break
+        console.log(chalk.red('Go back to the menu...'));
+        showUserMainMenu();
+        break;
+
     default:
         console.log(chalk.red('Invalid choice. Please try again.'));
-        showUserMenu();
-        break
+        showUserProfileMenu();
+        break;
     };
 };
-
-
-
-async function greetUser() 
-{
-    console.clear(); // Clear the console before displaying the greeting and animation
-    console.log(chalk.blue(`Welcome to my very first program ${userName}, be kind`));   
-    showUserMenu();
-}
-
-
 
 async function displayData()
 {
@@ -204,10 +272,12 @@ async function displayData()
         name: 'pressEnter',
         message: 'Press enter to go to the menu',
     })
-    showUserMenu();
+    showUserMainMenu();
 }
 
+// PENDIENTE: leer docu de Mongoose, las querys devuelven query objects pero y si se usa la sintaxis .exec() ? 
 
 
 
-export { displayUserInfo, handleUserChoice, showUserMenu, signUp, logIn, logInSignUp}
+
+export { showUserProfileMenu, userProfileMenuHandler, showUserMainMenu, signUp, logIn, logInSignUp}
