@@ -7,6 +7,8 @@ let currentUser = null
 async function logInSignUp ()
 {
     console.clear();
+    console.log(chalk.bgGreen('-------------WELCOME TO MY HUMBLE WEATHER APP-------------'));
+
     const signInSignUp = await inquirer.prompt([
         {
             type: 'list',
@@ -15,14 +17,14 @@ async function logInSignUp ()
             choices: [ 'Log in', 'Sign up'],
         },
       ])
-
+      console.clear();
       signInSignUp.choice === 'Log in' ? await logIn() : await signUp(); 
 };
 
 async function logIn ()
 {
-    
-    console.log("--------------------- LOGIN")
+    console.log(chalk.bgGreen('------------- LOG IN-------------'));
+
     const {email, password} = await inquirer.prompt([
         {
             type: 'input',
@@ -49,6 +51,7 @@ async function logIn ()
     }
     else
     {
+      console.clear();
       console.log('Incorrect password...')
       await logIn();
     }
@@ -56,7 +59,7 @@ async function logIn ()
 
 async function signUp()
 {
-    console.log("--------------------- SIGNUP")
+    console.log(chalk.bgGreen('------------- SIGN UP-------------'));
     const {userName, email, password } = await inquirer.prompt([
         {
             type: 'input',
@@ -82,19 +85,20 @@ async function signUp()
     if(userExists === null)
     {
         await createUser(userName, password, email);
+        console.clear();
     }
     else
     {
         console.log('This email is logged...');
     }
     // mostrar pantalla del login al terminar
-   await logIn();
+    await logIn();
 };
 
 // MANEJAR LA ELECCION DEL USUARIO
 async function showUserMainMenu() 
 {
-    //console.clear();
+    console.clear();
     console.log(chalk.bgGreen('------------- MENU-------------'));
     const userResponse = await inquirer.prompt([
     {
@@ -223,7 +227,7 @@ async function userProfileMenuHandler(choice)
           message: chalk.yellow("Are sure you want to delete profile? Type 'yes' to delete and 'no' to exit: "),
           validate(deleteConfirmation)
           {
-              if(deleteConfirmation !== 'yes' || deleteConfirmation !== 'no')
+              if(deleteConfirmation !== 'yes' && deleteConfirmation !== 'no')
               {
                   console.clear();
                   console.log("You must type 'yes' to delete and 'no' to exit");
@@ -237,7 +241,7 @@ async function userProfileMenuHandler(choice)
       if(deleteConfirmation === 'yes')
       {
         await deleteUser(currentUser._id);
-        console.clean();
+        console.clear();
         console.log(chalk.red('Your profile has been deleted'));
         await signUp();
       }
@@ -246,6 +250,7 @@ async function userProfileMenuHandler(choice)
         showUserProfileMenu();
       };
       break;
+
     case 'menu':
         console.log(chalk.red('Go back to the menu...'));
         showUserMainMenu();
