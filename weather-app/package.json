@@ -8,7 +8,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node App.js",
     "weather-app": "npm start",
-    "nodemon": "nodemon server.js"
+    "nodemon": "nodemon App.js"
   },
   "repository": {
     "type": "git",

@@ -25,3 +25,5 @@ Como hacer el volado masivo de datos a la db para los municipios.
 
 Como arrastrar la info del usuario del login al la pantalla del usuario
 
+
+EN DELETE PETA SI INTRODUCES ALGO QUE NO SEA YES O NO. ?????

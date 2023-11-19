@@ -4,7 +4,7 @@ import chalk from 'chalk';
 import axios from 'axios';
 import dotenv from 'dotenv';
 import { connectDB } from './helpers/database-moongose.js';
-import { logInSignUp} from './user.js'
+import { logInSignUp, showUserMainMenu} from './user.js'
 
 // 1- Conexion BBDD
 await connectDB()
@@ -13,4 +13,4 @@ await connectDB()
 await logInSignUp()
 
 // 3 - Menu principal
-//await 
+await showUserMainMenu()

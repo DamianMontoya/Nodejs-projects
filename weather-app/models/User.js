@@ -40,7 +40,6 @@ const UserModel = mongoose.model('User', userSchema);
 
 async function createUser(newUserName, newPassword, newEmail)
 {
-    console.log('first')
     const user = new UserModel
     (
         {
@@ -50,14 +49,7 @@ async function createUser(newUserName, newPassword, newEmail)
             history: []
         }
     )
-    console.log('connecting server...');
-
-
-
-    console.log('connected server succesfuly...');
-
     await user.save();
-    console.log('User saved succesfully...');
 };
 
 // RETORNA UN OBJETO DE USUARIO BUSCANDO POR EMAIL
@@ -66,7 +58,7 @@ async function findUserByEmail(UserEmail)
     try
     {
     const user = await UserModel.findOne({email : UserEmail});
-    console.log('finded user is... ', user);
+    //console.log('finded user is... ', user);
     return user;
     }
     catch(error)
@@ -75,11 +67,6 @@ async function findUserByEmail(UserEmail)
         return false;
     }
 };
-async function deleteUser ()
-{
-    UserModel.findOneAndDelete()
-}
-
 
 //RETORNA EL LISTADO DE TODOS LOS USUARIOS
 
@@ -100,15 +87,46 @@ async function findUserInfo(userEmail)
 
 // ACTUALIZA LO QUE QUIERA
 
-async function updateUserInfo()
+async function updateUserEmail(id, newEmail)
 {
-    UserModel.findOneAndUpdate({})
-} 
+    console.log('updaeting email...')
+    await UserModel.findOneAndUpdate(id, {email: newEmail});
+    console.log('updated email succesfully...')
+};
 
-export { UserModel, createUser, findUserByEmail }
+async function updateUserName(id, newUserName)
+{
+    console.log('updating userName...');
+    await UserModel.findOneAndUpdate(id, {userName: newUserName});
+    console.log('updated userName succesfully...');
+};
 
+async function updateUserPassword(id, newPassword)
+{
+    await UserModel.findOneAndUpdate(id, {password: newPassword});
+    console.log('updated password...')
+};
 
-UserModel.findOneAndDelete({_email: 'da@da.com' })
+async function findUserById(id)
+{
+    try
+    {
+    const user = await UserModel.findById(id);
+    return user;
+    }
+    catch(error)
+    {
+        console.log(error);
+    }
+};
+
+async function deleteUser(id)
+{
+    await UserModel.findByIdAndDelete(id);
+}
+export { UserModel, createUser, findUserByEmail, updateUserEmail, updateUserName, findUserById, updateUserPassword, deleteUser }
+
+//UserModel.findOneAndDelete({_email: 'da@da.com' })
 
 
 /*
