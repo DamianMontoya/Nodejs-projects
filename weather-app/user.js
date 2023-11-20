@@ -3,6 +3,7 @@ import { createUser, findUserByEmail, updateUserEmail, updateUserName, findUserB
 import chalk  from 'chalk';
 
 let currentUser = null
+let count = 0;
 
 async function logInSignUp ()
 {
@@ -23,6 +24,12 @@ async function logInSignUp ()
 
 async function logIn ()
 {
+    if(count >= 3)
+    {
+        count = 0;
+        console.clear();
+        await goPreviousMenu();
+    }
     console.log(chalk.bgGreen('------------- LOG IN-------------'));
 
     const {email, password} = await inquirer.prompt([
@@ -36,27 +43,59 @@ async function logIn ()
             name: 'password',
             message: 'Enter your password: ',
         },
+        // AQUI HAY QUE AÑADIR VALIDACION, IDEA: SEPARAR LOS PROMPTS
+        // EN FORMA DE EMAILPROMPT /PASSWORDPROMPT, VALIDARLOS Y LUEGO 
+        // LLAMAR AL INQUIRER
     ])
 
     currentUser = await findUserByEmail(email);
-    
-    //console.log('WARNING, THIS IS THE USER INFO', currentUser);
-    //console.log('WARNING, THIS SHOULD BE THE ID', currentUser._id);
-    //console.log('WARNING, THIS SHOULD BE JUST THE ID NUM ', currentUser._id.toHexString())
     
     if(currentUser !== null && currentUser.password === password)
     {
       console.log('Welcome ', currentUser.userName);
       showUserMainMenu();
     }
+    else if(currentUser === null)
+    {
+        count ++;
+        console.clear();
+        console.log('The email is not registered...')
+        await logIn();
+    }
     else
     {
-      console.clear();
-      console.log('Incorrect password...')
-      await logIn();
+        count ++;
+        console.clear();
+        console.log('Incorrect password...')
+        await logIn();
     }
 };
+// si el usuario falla 3 veces el logIn se llama a esta funcion y le da la opcion de volver atras sin que pete el programa
+async function goPreviousMenu()
+{
+    console.log(chalk.red('You seem stuck... Want to go back?'));
+    const { goBack } = await inquirer.prompt([
+        {
+            type: 'input',
+            name: 'goBack',
+            message: 'Type yes to go back, no to keep in this screen',
+            validate: function(input)
+            {
+                if(input.toLowerCase() === 'yes' || input.toLowerCase() === 'no')
+                {
+                    return true;
+                }
+                else
+                {
+                    return 'Please type yes to go back and no to keep in this screen';
+                }
+            }
+        },
+    ])
+    console.clear();
+    goBack === 'yes' ? await logInSignUp() : await logIn();
 
+}
 async function signUp()
 {
     console.log(chalk.bgGreen('------------- SIGN UP-------------'));
@@ -122,8 +161,7 @@ function userMainMenuHandler(choice)
   switch (choice) 
   {
     case 'weather':
-        console.log(chalk.yellow('Waiting for the city...'));
-        //displayData();
+        askCity();
         break;
 
     case 'history':
@@ -131,7 +169,6 @@ function userMainMenuHandler(choice)
         break;  
     
     case 'userProfile':
-        console.log(chalk.yellow('Searching user info...'));
         showUserProfileMenu();
         break
     case 'exit':
@@ -263,6 +300,8 @@ async function userProfileMenuHandler(choice)
     };
 };
 
+// Esta funcion ya no vale.
+/*
 async function displayData()
 {
     const city = await askCity();
@@ -279,10 +318,29 @@ async function displayData()
     })
     showUserMainMenu();
 }
-
+*/
 // PENDIENTE: leer docu de Mongoose, las querys devuelven query objects pero y si se usa la sintaxis .exec() ? 
+async function askCity ()
+{
+    const userInput = await inquirer.prompt
+    ({
+        type: 'input', 
+        name: 'city', 
+        message: chalk.yellow('Enter the city to know the weather: '),
+        validate(city)
+        {
+            if(!city)
+            {
+                console.log('You must enter a city');
+            }
+            return true;
+        }
+    });
+    console.log(userInput.city);
 
-
-
+    const city = (userInput.city.chartAt(0).toUpperCase() + userInput.city.slice(1).toLowerCase()).trim();
+    console.log(typeof city);
+    return city;
+};
 
 export { showUserProfileMenu, userProfileMenuHandler, showUserMainMenu, signUp, logIn, logInSignUp}
