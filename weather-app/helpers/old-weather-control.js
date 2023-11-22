@@ -66,3 +66,21 @@ async function getWeather(coordinates)
         throw new Error("Error fetching weather data from Open Weather");
     }
 };
+
+
+async function displayData()
+{
+    const city = await askCity();
+    const coordinates = await getCoordinates(city);
+    const data = await getWeather(coordinates);
+
+    console.log(data);
+
+    await inquirer.prompt
+    ({
+        type: 'input',
+        name: 'pressEnter',
+        message: 'Press enter to go to the menu',
+    })
+    showUserMainMenu();
+};

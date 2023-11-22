@@ -1,29 +1,33 @@
 import http from 'https'
 import {AEMET_KEY}  from './helpers/env-parser.js'
 import axios from 'axios'
+import {findCityCodByName, cityIsInDatabase}  from './models/City.js'
+import inquirer from 'inquirer';
+import chalk from 'chalk';
+import { insertHistoryDB } from './models/User.js';
+import { userMainMenuHandler } from  './user_v3.js';
+
+
 
 // PREGUNTA AL USUARIO LA CIUDAD, DEVUELVE EL NOMBRE DE LA CIUDAD
 async function askCity ()
 {
-    const userInput = await inquirer.prompt
+    const {city} = await inquirer.prompt
     ({
         type: 'input', 
         name: 'city', 
         message: chalk.yellow('Enter the city to know the weather: '),
-        validate(city)
-        {
-            if(!city)
-            {
-                console.log('You must enter a city');
-            }
-            return true;
-        }
+        validate: checkCityExistsDatabase
     });
-    
-    const city = userInput.city;
-    console.log(city);
+
     return city;
 };
+
+async function checkCityExistsDatabase(input)
+{
+  const cityExists = await cityIsInDatabase(input);
+  return cityExists;
+}
 
 // Entre la funcion de arriba y la de abajo viene la llamada al CityModel 
 // para extrar del nombre de la ciudad de arriba el codigo municipio para pasarlo abajo
@@ -32,7 +36,7 @@ async function askCity ()
 // pasandole el cod municipio te devuelve la URL con la info del tiempo
 async function getApiUrlResponse (codMunicipio)
 {
-    return new Promise((resolve) =>
+    return new Promise((resolve, reject) =>
     {
         const apiURL = `prediccion/especifica/municipio/diaria/${codMunicipio}`;
         const options = 
@@ -48,6 +52,11 @@ async function getApiUrlResponse (codMunicipio)
       
     const req = http.request(options, function (res) 
     {
+        if(res.statusCode !== 200)
+        {
+          console.log('Error during the request...');
+          reject(null);
+        }
         const chunks = [];
         let body
 
@@ -78,15 +87,17 @@ async function getWeather (url)
         const response = await axios.get(url);
 
         const weatherData = [];
+        console.clear();
+        console.log(chalk.green(`The weather in ${response.data[0].nombre} this week:`));
 
         const predicction = response.data[0].prediccion;
         predicction.dia.forEach((dia) => 
         {
-          // al ser un campo que a veces no rellenan si es = '' que diga que no hay data.
-          if(dia.estadoCielo[0].descripcion === '')
-          {
-            dia.estadoCielo[0].descripcion = 'For the moment there is no clear data';
-          }
+            // al ser un campo que a veces no rellenan si es = '' que diga que no hay data.
+            if(dia.estadoCielo[0].descripcion === '')
+            {
+              dia.estadoCielo[0].descripcion = 'For the moment there is no clear data';
+            }
             const basicInfo = 
             {
                 day: dia.fecha.slice(8, 10),
@@ -95,48 +106,68 @@ async function getWeather (url)
                 humidity: dia.humedadRelativa.maxima,
                 skyDescription: dia.estadoCielo[0].descripcion,
             };
-    
-            // Print the content directly
-            // O QUE RETORNE LA variable
-            console.log(`
-              day: ${basicInfo.day},
-              maxTemperature: ${basicInfo.maxTemperature},
-              minTemperature: ${basicInfo.minTemperature},
-              humidity: ${basicInfo.humidity},
-              skyDescription: ${basicInfo.skyDescription}
-           `);
-           weatherData.push(basicInfo);
+
+            weatherData.push(basicInfo);
+
         });
         return weatherData;
     } 
     catch(error)
     {
-        console.log(error);
+        console.log('Internet conection failed during the request...');
+        return [];
     }
 };
+// Esta funcion es enorme y abarca demasiado, hay que refactorizar
+async function getData(currentUser)
+{
+    const municipioNombre = await askCity();
+
+    //HECHO CON LA VALIDACION DE ARRIBA, NO PUEDE PASAR UNA CITY QUE NO EXISTA EN LA BD => falta validacion, si no se encuentra el COD en BD devuelva null y retorne a askCity()
+    const municipioCod = await findCityCodByName(municipioNombre);
+
+    //falta validacion, si el status es !200 promesa reject(null) y retorne askCity 
+    const responseDataURL = await getApiUrlResponse(municipioCod);
+    if(responseDataURL === null)
+    {
+        console.log(chalk.red('Error during the request proces...'));
+        await userMainMenuHandler('weather') 
+    }
+
+    //aqui no debiera petar, da OK si he configurado el manejo de la response de la URL de arriba
+    const weatherData = await getWeather(responseDataURL);
+    if(weatherData.length === 0)
+    {
+      console.log('Internet crashed... Did you pay last bill?');
+      await userMainMenuHandler('weather') 
+    }
+    //crear el objeto para luego insertarlo en la BD, habria que manejar que llegue aqui si arriba todo OK
+    const historyData = { city: municipioNombre, weather: weatherData, date: new Date()};
+    await insertHistoryDB(currentUser, historyData);
+
+    return weatherData;
+};
+
+async function logWeather(weatherData)
+{
+    weatherData.forEach(info =>
+      {
+          console.log(`Day: ${info.day}
+                       Max temperature: ${info.maxTemperature}ºC
+                       Min temperature: ${info.minTemperature}ºC
+                       Humidity: ${info.humidity}%
+                       Sky descriptione: ${info.skyDescription}}
+                      `)
+      });
+};
+export {getData, askCity, getApiUrlResponse, getWeather, logWeather }
 
 /* esta maneja toda la logica paso por paso:
     - pregunta por ciudad y retorna el nombre
     - query al CityModel pasandole el nombre, devuelve codigo municipio
     - se pasa el cod a responseDataURL que devuelve una URL con la prediccion
     - se hace la peticion a la URL de arriba y devuelve un objeto con la info basica
+    - inserta la busqueda en el historial
 
-    FALTA CONECTAR LA OPCION WEATHER DEL MAIN MENU CON LA FUNCION ASKCITY Y QUE CONCATENE TODO. 
-    CON TODO ESTO Y QUE CUADRE
+  promise.all => array promises resueltas.
 */
-async function mun (){ return '01001'}; // <= Mockeo de la llamada a la basde de datos por no estar todavia creada
-
-// funcion que retorna el tiempito
-async function getData()
-{
-    const municipioNombre = await askCity();
-    const municipioCod = await mun();
-    //const municipioCod = getCityIdByName(municipioNombre);
-    const responseDataURL = await getApiUrlResponse(municipioCod);
-    const responseWeather = await getWeather(responseDataURL);
-
-    return responseWeather;
-};
-
-
-getData();
