@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
-import { showUserMainMenu, goPreviousMenu } from '../user_v3.js';
+import { showUserMainMenu, goBack } from '../user_v3.js';
+import { logWeather } from '../aemet-request.js';
 import inquirer from 'inquirer';
 import chalk from 'chalk';
 
@@ -180,12 +181,15 @@ async function userSearchHistory(currentUser)
     try 
     {
         const {history} = await UserModel.findById(currentUser._id);
+        //console.log('history inside userSearchHistory', history)
         if(history.length === 0)
         {
             console.log(chalk.red('No searches done yet'));
-            await goPreviousMenu();
+            // await showUserMainMenu(); 
+            await goBack();
         }
-        displayUserHistory(history)
+        //await displayUserSearchHistory(history)
+        return history;
     }
     catch (error) 
     {
@@ -197,6 +201,8 @@ async function userSearchHistory(currentUser)
 // COMPROBAR PORQUE DA LA ULTIMA UNDEFINED
 async function displayUserSearchHistory(history)
 {
+    //console.log('history inside displayUserSearchHistory', history)
+
     history.forEach((search, index = 1  )=>
         {
             console.log
@@ -204,46 +210,65 @@ async function displayUserSearchHistory(history)
                 City searched: ${search.city}
             `)
         })
-        await selectHistory(history)
+        //await selectHistorySearchIndex(history)
 };
 
 
 async function selectHistorySearchIndex(history)
 {
-    const {selectedSearchIndex} = await inquirer.prompt([
+    //console.log('history inside selectHistorySearchIndex', history)
+
+    const { selectedSearchIndex } = await inquirer.prompt([
     {
         type: 'input',
-        name: 'choice',
-        message: 'Chose the index of the search to see the weather',
+        name: 'selectedSearchIndex',
+        message: 'Chose the index of the search to see the weather: ',
         validate: function(input)
         {
-            if(input < 0 && input >= currentUser.history.length)
+            if(input < 0 && input >= history.length)
             {
-                console.log(chalk.red('You must enter the number of one of the searches'));
+                console.log(chalk.red('You must enter the index number of one of the searches'));
                 return false;
             }
             return true;
         }
     }])
+    
     return selectedSearchIndex;
+    //await logSelectedSearchHistory(selectedSearchIndex);
 };
-async function logSelectedSearchHistory(selectedSearchIndex)
-{    const { selectedWeather } = history[choice].weather;
-    console.log(selectedWeather)
-    console.log(chalk.green(history[choice].weather));
-    await goPreviousMenu();
+
+async function logSelectedSearchHistory(completeHistorySearch, selectedSearchIndex)
+{   
+    const  selectedWeather  = completeHistorySearch[selectedSearchIndex].weather;
+
+    await logWeather(selectedWeather);
 }
-/*
-async function selectHistory(data)
+
+async function showSearchHistoryLogic(currentUser)
 {
-    const {choice} = inquirer.prompt([
-        type: 'list',
-        name: 'selectHistory',
+    try
+    {
+        // checkear si no hay historial => devulve al menu, de lo contrario almacena historial
+        const completeHistorySearch = await userSearchHistory(currentUser);
         
-    ])
-};
-*/
-export { UserModel, createUser, findUserByEmail, updateUserEmail, updateUserName, findUserById, updateUserPassword, deleteUser, userEmailIsRegisred, insertHistoryDB, userSearchHistory }
+        //Muestra el historial completo por  pantalla
+        await displayUserSearchHistory(completeHistorySearch);
+
+        // el usuario escoge que index de historial desea visualizar
+        const chosenHistorySearch = await selectHistorySearchIndex(completeHistorySearch);
+
+        // muestra por pantalla el tiempo del historial escogido
+        await logSelectedSearchHistory(completeHistorySearch, chosenHistorySearch);
+
+    }
+    catch(error)
+    {
+        console.log('Error getting history data...', error)
+    }
+}
+
+export { UserModel, createUser, findUserByEmail, updateUserEmail, updateUserName, findUserById, updateUserPassword, deleteUser, userEmailIsRegisred, insertHistoryDB, userSearchHistory, showSearchHistoryLogic }
 
 
 
