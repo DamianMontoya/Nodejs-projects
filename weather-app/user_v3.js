@@ -1,5 +1,5 @@
 import inquirer from 'inquirer';
-import { createUser, findUserByEmail, updateUserEmail, updateUserName, findUserById, updateUserPassword, deleteUser, userEmailIsRegisred, userSearchHistory } from './models/User.js';
+import { createUser, findUserByEmail, updateUserEmail, updateUserName, findUserById, updateUserPassword, deleteUser, userEmailIsRegisred, userSearchHistory, showSearchHistoryLogic } from './models/User.js';
 import chalk  from 'chalk';
 import { getData, logWeather } from './aemet-request.js';
 
@@ -277,16 +277,24 @@ async function goBack (currentUser)
             type: 'list',
             name: 'choice',
             message: chalk.yellow('Select an option:\n'),
-            choices: [ 'Search another city weather', 'Go back to main menu'],
-            validate: function (choice)
-            {
-                return choice === 'Search another city weather' || choice === 'Go back to main menu' ? true : console.log('You must chose one option');
-            }
+            choices: [ 'Search another city weather', 'Go back to main menu', 'See my search history'],
+            //validate: function (choice)
+            //{
+            //    return choice === 'Search another city weather' || choice === 'Go back to main menu' ? true : console.log('You must chose one option');
+            //}
         },
       ])
-
+      if(choice === 'Search another city weather')
+      {
+        await userMainMenuHandler('weather');
+      }
+      else if(choice === 'Go back to main menu')
+      {
+        await showUserMainMenu();
+      }
+      await showSearchHistoryLogic(currentUser)
     //choice === 'Search another city weather' ? await getData(currentUser) : await showUserMainMenu(); 
-    choice === 'Search another city weather' ? await userMainMenuHandler('weather') : await showUserMainMenu(); 
+    //choice === 'Search another city weather' ? await userMainMenuHandler('weather') : await showUserMainMenu(); 
 
 };
 // COMBINAR LOS DOS MENU HANDLERS EN ESTE, CON UN SWITCH BASTA PARA MANEJAR TODAS LAS RESPUESTAS AKA userResponseHandler(choicita)
@@ -300,7 +308,8 @@ async function userMainMenuHandler(choice)
         await goBack(currentUser);
         break;
     case 'history':
-        await userSearchHistory(currentUser);
+        await showSearchHistoryLogic(currentUser);
+        await goBack();
         break;  
     
     case 'userProfile':
@@ -541,4 +550,4 @@ async function deleteUserProfile()
 
 // PENDIENTE: leer docu de Mongoose, las querys devuelven query objects pero y si se usa la sintaxis .exec() ? 
 
-export { showUserProfileMenu, userProfileMenuHandler, showUserMainMenu, signUp, logIn, logInSignUp, userMainMenuHandler, goPreviousMenu }
+export { showUserProfileMenu, userProfileMenuHandler, showUserMainMenu, signUp, logIn, logInSignUp, userMainMenuHandler, goPreviousMenu, goBack }
