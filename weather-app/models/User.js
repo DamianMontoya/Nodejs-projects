@@ -4,7 +4,7 @@ import { logWeather } from '../aemet-request.js';
 import inquirer from 'inquirer';
 import chalk from 'chalk';
 
-// EL ESQUEMA DEL USUARIO
+// EL ESQUEMA DEL USUARIOW
 const userSchema = mongoose.Schema(
     {
         userName: 
@@ -158,8 +158,7 @@ async function insertHistoryDB(currentUser, newHistoryInsert)
 
         if(currentUser.history.length <= 9)
         {
-            const porFavorFunciona = await UserModel.updateOne({ _id: currentUser._id }, { $push: { history: { $position: 0, newHistoryInsert } } })
-            //console.log(porFavorFunciona);
+            await UserModel.updateOne({ _id: currentUser._id }, { $push: { history: { $each: [newHistoryInsert], $position: 0 } } });
         }
         else
         { 
@@ -181,14 +180,13 @@ async function userSearchHistory(currentUser)
     try 
     {
         const {history} = await UserModel.findById(currentUser._id);
-        //console.log('history inside userSearchHistory', history)
         if(history.length === 0)
         {
+            console.clear();
             console.log(chalk.red('No searches done yet'));
-            // await showUserMainMenu(); 
-            await goBack();
+            return null;
         }
-        //await displayUserSearchHistory(history)
+
         return history;
     }
     catch (error) 
@@ -201,46 +199,43 @@ async function userSearchHistory(currentUser)
 // COMPROBAR PORQUE DA LA ULTIMA UNDEFINED
 async function displayUserSearchHistory(history)
 {
-    //console.log('history inside displayUserSearchHistory', history)
 
-    history.forEach((search, index = 1  )=>
+    history.forEach((search, index)=>
         {
             console.log
-            (`  ${index}- Date of search: ${search.date} 
-                City searched: ${search.city}
+            (`  
+                ${index+1}- Date of search: ${search.date} 
+                   City searched: ${search.city}
             `)
         })
-        //await selectHistorySearchIndex(history)
 };
 
 
 async function selectHistorySearchIndex(history)
 {
-    //console.log('history inside selectHistorySearchIndex', history)
-
     const { selectedSearchIndex } = await inquirer.prompt([
     {
         type: 'input',
         name: 'selectedSearchIndex',
-        message: 'Chose the index of the search to see the weather: ',
+        message: chalk.yellow('Chose the index of the search to see the weather: '),
         validate: function(input)
         {
-            if(input < 0 && input >= history.length)
+            if(input <= 0 || input > history.length || isNaN(input))
             {
-                console.log(chalk.red('You must enter the index number of one of the searches'));
+                console.log(chalk.red('\nYou must enter the index number of one of the searches'));
                 return false;
             }
             return true;
         }
     }])
-    
-    return selectedSearchIndex;
-    //await logSelectedSearchHistory(selectedSearchIndex);
+    return selectedSearchIndex -1;
 };
 
 async function logSelectedSearchHistory(completeHistorySearch, selectedSearchIndex)
 {   
+    console.log('DENTRO DE LOGSELECTEDDATA', completeHistorySearch, selectedSearchIndex)
     const  selectedWeather  = completeHistorySearch[selectedSearchIndex].weather;
+    console.log('DENTRO DE SELECTED DATAAAAAAAAA', selectedWeather)
 
     await logWeather(selectedWeather);
 }
@@ -251,7 +246,11 @@ async function showSearchHistoryLogic(currentUser)
     {
         // checkear si no hay historial => devulve al menu, de lo contrario almacena historial
         const completeHistorySearch = await userSearchHistory(currentUser);
-        
+        if(completeHistorySearch === null)
+        {
+            return;
+        }
+
         //Muestra el historial completo por  pantalla
         await displayUserSearchHistory(completeHistorySearch);
 
@@ -269,7 +268,6 @@ async function showSearchHistoryLogic(currentUser)
 }
 
 export { UserModel, createUser, findUserByEmail, updateUserEmail, updateUserName, findUserById, updateUserPassword, deleteUser, userEmailIsRegisred, insertHistoryDB, userSearchHistory, showSearchHistoryLogic }
-
 
 
 /*
