@@ -270,10 +270,8 @@ async function showUserMainMenu()
 
 async function goBack (currentUser)
 {
-    chalk.yellow('Press any key to go back to the Main Menu');
-
     const {choice} = await inquirer.prompt([
-        {
+    {
             type: 'list',
             name: 'choice',
             message: chalk.yellow('Select an option:\n'),
@@ -282,20 +280,20 @@ async function goBack (currentUser)
             //{
             //    return choice === 'Search another city weather' || choice === 'Go back to main menu' ? true : console.log('You must chose one option');
             //}
-        },
-      ])
-      if(choice === 'Search another city weather')
-      {
-        await userMainMenuHandler('weather');
-      }
-      else if(choice === 'Go back to main menu')
-      {
-        await showUserMainMenu();
-      }
-      await showSearchHistoryLogic(currentUser)
-    //choice === 'Search another city weather' ? await getData(currentUser) : await showUserMainMenu(); 
-    //choice === 'Search another city weather' ? await userMainMenuHandler('weather') : await showUserMainMenu(); 
+    }])
 
+    if(choice === 'Search another city weather')
+    {
+        await userMainMenuHandler('weather');
+    }
+    else if(choice === 'Go back to main menu')
+    {
+        await showUserMainMenu();
+    }
+    else
+    {
+        await userMainMenuHandler('history');
+    }
 };
 // COMBINAR LOS DOS MENU HANDLERS EN ESTE, CON UN SWITCH BASTA PARA MANEJAR TODAS LAS RESPUESTAS AKA userResponseHandler(choicita)
 async function userMainMenuHandler(choice) 
@@ -307,9 +305,10 @@ async function userMainMenuHandler(choice)
         await logWeather(data);
         await goBack(currentUser);
         break;
-    case 'history':
+    
+        case 'history':
         await showSearchHistoryLogic(currentUser);
-        await goBack();
+        await goBack(currentUser);
         break;  
     
     case 'userProfile':
