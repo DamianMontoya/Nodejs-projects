@@ -153,19 +153,15 @@ async function insertHistoryDB(currentUser, newHistoryInsert)
 {
     try
     {
-        //console.log('CURRENT USER INSDE INSERT HISTORY DB', currentUser);
-        //console.log('NEW HISTORY ABOUT TO BE PUSHED', newHistoryInsert)
-
         if(currentUser.history.length <= 9)
         {
             await UserModel.updateOne({ _id: currentUser._id }, { $push: { history: { $each: [newHistoryInsert], $position: 0 } } });
         }
         else
         { 
-            //check history array indexes, 1 the last and -1 the first
-            //pushear la busqueda al primer index
+            // insert data into first index
             await UserModel.updateOne({ _id: currentUser._id }, { $push: { history: { $each: [newHistoryInsert], $position: 0 } } });
-            //eliminar la data del ultimo index
+            // erase last index data
              await UserModel.updateOne({ _id: currentUser._id }, { $pop: {history: 1} })
         }
     }
@@ -196,7 +192,7 @@ async function userSearchHistory(currentUser)
     }
 };
 
-// COMPROBAR PORQUE DA LA ULTIMA UNDEFINED
+// displays the city and date of the user history search
 async function displayUserSearchHistory(history)
 {
 
@@ -210,7 +206,7 @@ async function displayUserSearchHistory(history)
         })
 };
 
-
+// user selects the index of the history search and returns it
 async function selectHistorySearchIndex(history)
 {
     const { selectedSearchIndex } = await inquirer.prompt([
@@ -230,13 +226,10 @@ async function selectHistorySearchIndex(history)
     }])
     return selectedSearchIndex -1;
 };
-
+// displays the selected history search 
 async function logSelectedSearchHistory(completeHistorySearch, selectedSearchIndex)
 {   
-    console.log('DENTRO DE LOGSELECTEDDATA', completeHistorySearch, selectedSearchIndex)
     const  selectedWeather  = completeHistorySearch[selectedSearchIndex].weather;
-    console.log('DENTRO DE SELECTED DATAAAAAAAAA', selectedWeather)
-
     await logWeather(selectedWeather);
 }
 

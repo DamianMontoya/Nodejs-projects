@@ -32,11 +32,10 @@ async function findCityCodByName(cityName)
 // otra manera mas simple de encontrar el id por nombre
 async function cityIsInDatabase(cityName) 
 {
-    const city = await CityModel.findOne({ nombre: cityName });
+    const findedCity = await CityModel.findOne({ nombre: cityName });
   
-    if (!city) 
+    if (!findedCity) 
     {
-        console.log('\nNo city finded...')
         return false;
     }
     return true;
@@ -64,7 +63,7 @@ async function insertCitiesDB (path)
 };
 
 
-// VUELCA EL JSON EN LA DB, FALTABA CONECTAR LA BASE DE DATOS LMAOOOOOOOOOOOOOOO
+// Loads the municipios JSON file into database the first time you run the program 
 async function loadCityData(path) 
 {
     console.log('LETS GO')
@@ -81,8 +80,16 @@ async function loadCityData(path)
         console.error('Error loading data:', error);
     }
 };
+// Checks in database if any city contains the provided string to find matches and suggest them to the user
+async function getSuggestions(input) 
+{
+    const partialMatches = await CityModel.find({ nombre: { $regex: input, $options: 'i' } }).limit(10);
+    const suggestedCities =  partialMatches.map((city) => city.nombre);
+    return suggestedCities;
+}
 
-export { CityModel, findCityCodByName, cityIsInDatabase, loadCityData }
+
+export { CityModel, findCityCodByName, cityIsInDatabase, loadCityData, getSuggestions }
 
 // DUDA: habría que cargar las ciudades en la base de datos la primera vez 
 // que se arranca en local? 

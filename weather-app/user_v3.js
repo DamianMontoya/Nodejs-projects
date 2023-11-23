@@ -298,28 +298,31 @@ async function goBack (currentUser)
 // COMBINAR LOS DOS MENU HANDLERS EN ESTE, CON UN SWITCH BASTA PARA MANEJAR TODAS LAS RESPUESTAS AKA userResponseHandler(choicita)
 async function userMainMenuHandler(choice) 
 {
-  switch (choice) 
-  {
-    case 'weather':
-        const data = await getData(currentUser);
-        await logWeather(data);
-        await goBack(currentUser);
-        break;
+    switch (choice) 
+    {
+        case 'weather':
+            const data = await getData(currentUser);
+            await logWeather(data);
+            await goBack(currentUser);
+            break;
     
         case 'history':
-        await showSearchHistoryLogic(currentUser);
-        await goBack(currentUser);
-        break;  
+            console.clear();
+            await showSearchHistoryLogic(currentUser);
+            await goBack(currentUser);
+            break;  
     
-    case 'userProfile':
-        showUserProfileMenu();
-        break;
-    case 'exit':
-        console.log(chalk.red('Exiting...'));
-        process.exit(1);
-    default:
-      console.log(chalk.red('Invalid choice. Please try again.'));
-      showUserMainMenu();
+        case 'userProfile':
+            showUserProfileMenu();
+            break;
+        
+        case 'exit':
+            console.log(chalk.red('Exiting...'));
+            process.exit(1);
+
+        default:
+            console.log(chalk.red('Invalid choice. Please try again.'));
+            await showUserMainMenu();
   };
 };
 

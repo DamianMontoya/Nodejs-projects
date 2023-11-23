@@ -1,7 +1,7 @@
 import http from 'https'
 import {AEMET_KEY}  from './helpers/env-parser.js'
 import axios from 'axios'
-import {findCityCodByName, cityIsInDatabase}  from './models/City.js'
+import {findCityCodByName, cityIsInDatabase, getSuggestions}  from './models/City.js'
 import inquirer from 'inquirer';
 import chalk from 'chalk';
 import { insertHistoryDB } from './models/User.js';
@@ -9,7 +9,7 @@ import { userMainMenuHandler } from  './user_v3.js';
 
 
 
-// PREGUNTA AL USUARIO LA CIUDAD, DEVUELVE EL NOMBRE DE LA CIUDAD
+// Ask city to the user and returns it 
 async function askCity ()
 {
     const {city} = await inquirer.prompt
@@ -24,16 +24,27 @@ async function askCity ()
 };
 
 async function checkCityExistsDatabase(input)
-{
-  const cityExists = await cityIsInDatabase(input);
-  return cityExists;
+{   
+    const cityExists = await cityIsInDatabase(input);
+
+    if(!cityExists)
+    {
+        console.clear();
+        console.log(chalk.blue('No city finded, maybe you mean one of the following?\n'));
+        const citySuggestions = await getSuggestions(input);
+        
+        citySuggestions.forEach(City =>
+            {
+                console.log(City);
+            })
+        return false;
+    }
+    return true;
 }
 
-// Entre la funcion de arriba y la de abajo viene la llamada al CityModel 
-// para extrar del nombre de la ciudad de arriba el codigo municipio para pasarlo abajo
 
 
-// pasandole el cod municipio te devuelve la URL con la info del tiempo
+// returns the URL of the weather of a given city ID
 async function getApiUrlResponse (codMunicipio)
 {
     return new Promise((resolve, reject) =>
@@ -79,7 +90,7 @@ async function getApiUrlResponse (codMunicipio)
     });
 };
 
-// funcion que hace peticion a la URL de la prediccion, devuelve data extraida en obj
+// Req of a 
 async function getWeather (url)
 {
     try
@@ -88,12 +99,16 @@ async function getWeather (url)
 
         const weatherData = [];
         console.clear();
+
+        // PARA QUE ESTO SE VEA SIEMPRE PODRIA UNSHIFTEARLO A PRIMERA POSICION
+        // FUERA DEL FOR EACH. PROBLEMA: SERIA UN ARRAY DE TITULO+7 DIAS DE TIEMPO
+        // HABRIA QUE MANEJARLO EN LA PANTALLA DE MOSTRAR HISTORIA ETC.
         console.log(chalk.green(`The weather in ${response.data[0].nombre} this week:`));
 
         const predicction = response.data[0].prediccion;
         predicction.dia.forEach((dia) => 
         {
-            // al ser un campo que a veces no rellenan si es = '' que diga que no hay data.
+            // AEMET does not always return the descripcion field so this handles it
             if(dia.estadoCielo[0].descripcion === '')
             {
               dia.estadoCielo[0].descripcion = 'For the moment there is no clear data';
@@ -118,15 +133,16 @@ async function getWeather (url)
         return [];
     }
 };
-// Esta funcion es enorme y abarca demasiado, hay que refactorizar
+// Has the logic of everything related to weather, from asking the city to returning the weather 
 async function getData(currentUser)
 {
+    // Gets city name
     const municipioNombre = await askCity();
 
-    //HECHO CON LA VALIDACION DE ARRIBA, NO PUEDE PASAR UNA CITY QUE NO EXISTA EN LA BD => falta validacion, si no se encuentra el COD en BD devuelva null y retorne a askCity()
+    // Gets city ID of a given city name
     const municipioCod = await findCityCodByName(municipioNombre);
 
-    //falta validacion, si el status es !200 promesa reject(null) y retorne askCity 
+    // Gets URL with weather data of a given city ID
     const responseDataURL = await getApiUrlResponse(municipioCod);
     if(responseDataURL === null)
     {
@@ -134,32 +150,34 @@ async function getData(currentUser)
         await userMainMenuHandler('weather') 
     }
 
-    //aqui no debiera petar, da OK si he configurado el manejo de la response de la URL de arriba
+    // Stores the weather and handles conection issues
     const weatherData = await getWeather(responseDataURL);
     if(weatherData.length === 0)
     {
       console.log('Internet crashed... Did you pay last bill?');
       await userMainMenuHandler('weather') 
     }
-    //crear el objeto para luego insertarlo en la BD, habria que manejar que llegue aqui si arriba todo OK
-    const historyData = { city: municipioNombre, weather: weatherData, date: new Date()};
+    // Inserts the data into database
+    const historyData = { city: municipioNombre, weather: weatherData, date: new Date().toLocaleString()};
     await insertHistoryDB(currentUser, historyData);
 
     return weatherData;
 };
-
+// Easy way of displaying weather data in prompt
 async function logWeather(weatherData)
 {
     weatherData.forEach(info =>
       {
-          console.log(`Day: ${info.day}
+          console.log(`
+                               Day: ${info.day}\n
                        Max temperature: ${info.maxTemperature}ºC
                        Min temperature: ${info.minTemperature}ºC
                        Humidity: ${info.humidity}%
-                       Sky descriptione: ${info.skyDescription}}
+                       Sky descriptione: ${info.skyDescription}
                       `)
       });
 };
+
 export {getData, askCity, getApiUrlResponse, getWeather, logWeather }
 
 /* esta maneja toda la logica paso por paso:

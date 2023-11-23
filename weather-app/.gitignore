@@ -2,3 +2,4 @@ node_modules
 .env
 old_dev
 dev_v4
+.vscode

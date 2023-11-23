@@ -10,10 +10,9 @@ import { logInSignUp, showUserMainMenu} from './user_v3.js'
 // 1- Conexion BBDD
 await connectDB();
 
-
-
 // 2- Login o registro
 await logInSignUp();
 
-// 3 - Menu principal, a partir de aqui el programa corre
+// 3 - Menu principal, a partir de aqui el programa corre 
+//     hasta que el usuario escoga la opcion exit
 await showUserMainMenu();
