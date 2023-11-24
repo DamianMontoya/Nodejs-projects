@@ -12,6 +12,7 @@ import { userMainMenuHandler } from  './user_v3.js';
 // Ask city to the user and returns it 
 async function askCity ()
 {
+    console.clear();
     const {city} = await inquirer.prompt
     ({
         type: 'input', 
@@ -25,6 +26,12 @@ async function askCity ()
 
 async function checkCityExistsDatabase(input)
 {   
+    if(input.match(/[0-9]/g))
+    {   
+        console.clear();
+        console.log(chalk.red('\nA city cant numbers in its name'));
+        return false;
+    }
     const cityExists = await cityIsInDatabase(input);
 
     if(!cityExists)
@@ -32,7 +39,7 @@ async function checkCityExistsDatabase(input)
         console.clear();
         console.log(chalk.blue('No city finded, maybe you mean one of the following?\n'));
         const citySuggestions = await getSuggestions(input);
-        
+        console.log('\n')
         citySuggestions.forEach(City =>
             {
                 console.log(City);
@@ -41,8 +48,6 @@ async function checkCityExistsDatabase(input)
     }
     return true;
 }
-
-
 
 // returns the URL of the weather of a given city ID
 async function getApiUrlResponse (codMunicipio)
@@ -166,6 +171,7 @@ async function getData(currentUser)
 // Easy way of displaying weather data in prompt
 async function logWeather(weatherData)
 {
+    console.clear();
     weatherData.forEach(info =>
       {
           console.log(`
@@ -178,7 +184,7 @@ async function logWeather(weatherData)
       });
 };
 
-export {getData, askCity, getApiUrlResponse, getWeather, logWeather }
+export {getData, askCity, getApiUrlResponse, getWeather, logWeather,checkCityExistsDatabase }
 
 /* esta maneja toda la logica paso por paso:
     - pregunta por ciudad y retorna el nombre

@@ -1,4 +1,3 @@
-
 import mongoose from 'mongoose';
 import { DATABASE_URI } from './env-parser.js';
 

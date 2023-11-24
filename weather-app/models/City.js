@@ -43,8 +43,13 @@ async function cityIsInDatabase(cityName)
 
 async function showAllCities()
 {
-    const cities = CityModel.find()
-    //console.log(cities);
+    const cities = await CityModel.find();
+    const  pruebita = [];
+    cities.forEach(city =>
+        {
+            pruebita.push({cod_mun : city.cod_mun, nombre : city.nombre});
+        })
+    return pruebita;
 };
 
 async function insertCitiesDB (path)
@@ -89,7 +94,7 @@ async function getSuggestions(input)
 }
 
 
-export { CityModel, findCityCodByName, cityIsInDatabase, loadCityData, getSuggestions }
+export { CityModel, findCityCodByName, cityIsInDatabase, loadCityData, getSuggestions, showAllCities }
 
 // DUDA: habría que cargar las ciudades en la base de datos la primera vez 
 // que se arranca en local? 

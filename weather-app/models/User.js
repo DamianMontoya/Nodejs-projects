@@ -89,8 +89,8 @@ async function userEmailIsRegisred(UserEmail)
 
 async function findAllUsers()
 {
-    const userList = await UserModel.find();
-    console.log('Loading the list of users...', userList);
+    const userList = await UserModel.find({});
+    console.log('Loading the list of users...',);
     return userList;
 };
 
