@@ -50,7 +50,7 @@ async function logInPrompt()
 
     const passwordPrompt = 
     {
-        type: 'input',
+        type: 'password',
         name: 'password',
         message: 'Enter your password with at least 6 characters and one number: ',
         validate: validatePassword  
@@ -191,7 +191,7 @@ function validateUserName(input)
 async function signUpPrompt()
 {
     console.log(chalk.bgGreen('------------- SIGN UP-------------'));
-    const {userName, email, password } = await inquirer.prompt([
+    const {userName, email } = await inquirer.prompt([
         {
             type: 'input',
             name: 'userName',
@@ -204,13 +204,33 @@ async function signUpPrompt()
             message: 'Enter your email: ',
             validate: validateEmail
         },
+    ]);
+
+    let password, confirmPassword;
+    do
+    {
+        const passwordPrompt = 
         {
             type: 'password',
             name: 'password',
             message: 'Enter your password: ',
-            validate: validatePassword
-        },
-    ])
+            validate: validatePassword,
+        };
+    
+        const confirmPasswordPrompt = 
+        {
+            type: 'password',
+            name: 'confirmPassword',
+            message: 'Enter your password: ',
+        };
+        ({ password, confirmPassword } = await inquirer.prompt([ passwordPrompt, confirmPasswordPrompt]));
+        if(password !== confirmPassword)
+        {
+            console.clear();
+            console.log('Passwords dont match, try again');
+        }
+    }while(password !== confirmPassword)
+
     return { userName, email, password };
 };
 
