@@ -88,21 +88,21 @@ async function validateUser (currentUser, password)
         {
         console.log('Welcome ', currentUser.userName);
         }
-    }
-    //este if se podría meter dentro del de arriba ya que ya estoy comparando el null
-    else if(currentUser === null)
-    {
-        count ++;
-        console.clear();
-        console.log('The email is not registered...')
-        await logIn();
+        else
+        {
+            count ++;
+            console.clear();
+            console.log('Incorrect password...')
+            await logIn(); 
+        }
+        
     }
     else
     {
         count ++;
         console.clear();
-        console.log('Incorrect password...')
-        await logIn(); 
+        console.log('The email is not registered...')
+        await logIn();
     }
 };
 // pantalla de login
