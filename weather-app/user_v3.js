@@ -2,7 +2,7 @@ import inquirer from 'inquirer';
 import { createUser, findUserByEmail, updateUserEmail, updateUserName, findUserById, updateUserPassword, deleteUser, userEmailIsRegisred, userSearchHistory, showSearchHistoryLogic } from './models/User.js';
 import chalk  from 'chalk';
 import { getData, logWeather } from './aemet-request.js';
-
+import bcrypt from 'bcrypt';
 let currentUser = null
 let count = 0;
 
@@ -81,11 +81,15 @@ async function findUser (email)
 // PROBLEMA: o se llama aqui a User Menu o en la App. Decidir flujo y refactorizar
 async function validateUser (currentUser, password)
 {
-    if(currentUser !== null && currentUser.password && currentUser.password === password)
+    if(currentUser !== null)
     {
+        const passwordsMatch = await bcrypt.compare(password, currentUser.password)
+        if(passwordsMatch)
+        {
         console.log('Welcome ', currentUser.userName);
-        //showUserMainMenu();
+        }
     }
+    //este if se podría meter dentro del de arriba ya que ya estoy comparando el null
     else if(currentUser === null)
     {
         count ++;

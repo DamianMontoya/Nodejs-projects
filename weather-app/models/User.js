@@ -3,6 +3,7 @@ import { showUserMainMenu, goBack } from '../user_v3.js';
 import { logWeather } from '../aemet-request.js';
 import inquirer from 'inquirer';
 import chalk from 'chalk';
+import bcrypt from 'bcrypt';
 
 // EL ESQUEMA DEL USUARIOW
 const userSchema = mongoose.Schema(
@@ -44,11 +45,12 @@ const UserModel = mongoose.model('User', userSchema);
 
 async function createUser(newUserName, newPassword, newEmail)
 {
+    const cryptedPassword = await bcrypt.hash(newPassword,10);
     const user = new UserModel
     (
         {
             userName: newUserName,
-            password: newPassword,
+            password: cryptedPassword,
             email: newEmail,
             history: []
         }
@@ -116,7 +118,8 @@ async function updateUserName(id, newUserName)
 
 async function updateUserPassword(id, newPassword)
 {
-    await UserModel.findOneAndUpdate(id, {password: newPassword});
+    const cryptedPassword = await bcrypt.hash(newPassword, 10);
+    await UserModel.findOneAndUpdate(id, {password: cryptedPassword});
 };
 
 async function findUserById(id)
