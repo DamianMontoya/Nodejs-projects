@@ -206,6 +206,14 @@ async function signUpPrompt()
         },
     ]);
 
+    const password = await confirmPassword();
+
+    return { userName, email, password };
+};
+
+async function confirmPassword()
+{
+
     let password, confirmPassword;
     do
     {
@@ -230,9 +238,8 @@ async function signUpPrompt()
             console.log('Passwords dont match, try again');
         }
     }while(password !== confirmPassword)
-
-    return { userName, email, password };
-};
+    return password;
+}
 
 async function userCreateHandleError (userName, email, password)
 {
@@ -406,15 +413,7 @@ async function userProfileMenuHandler(choice)
 async function changePasswordPrompt()
 {
     console.clear();
-    const { newPassword } = await inquirer.prompt([
-    {
-        type: 'password',
-        name: 'newPassowrd',
-        message: chalk.yellow('Enter your new password: '),
-        validate: validatePassword
-    }
-    ]);
-
+    const newPassword = await confirmPassword();
     return newPassword;
 };
 
