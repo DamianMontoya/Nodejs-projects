@@ -5,7 +5,7 @@
   "main": "app.js",
   "type": "module",
   "scripts": {
-    "test": "node tests/**/*.test.js",
+    "test": "node tests/user_v3_test.js/logInSignUp.test.js",
     "start": "node App.js",
     "weather-app": "npm start",
     "nodemon": "nodemon App.js"
@@ -30,6 +30,7 @@
   "homepage": "https://github.com/DamianMontoya/Nodejs-projects#readme",
   "dependencies": {
     "axios": "^1.6.2",
+    "bcrypt": "^5.1.1",
     "chalk": "^5.3.0",
     "express": "^4.18.2",
     "inquirer": "^9.2.12",
@@ -38,7 +39,6 @@
   },
   "devDependencies": {
     "dotenv": "^16.3.1",
-    "jest": "^29.7.0",
     "nodemon": "^3.0.1"
   }
 }

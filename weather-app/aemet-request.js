@@ -105,9 +105,7 @@ async function getWeather (url)
         const weatherData = [];
         console.clear();
 
-        // PARA QUE ESTO SE VEA SIEMPRE PODRIA UNSHIFTEARLO A PRIMERA POSICION
-        // FUERA DEL FOR EACH. PROBLEMA: SERIA UN ARRAY DE TITULO+7 DIAS DE TIEMPO
-        // HABRIA QUE MANEJARLO EN LA PANTALLA DE MOSTRAR HISTORIA ETC.
+        console.log('\n\n\n\n\n\n\n\n')
         console.log(chalk.green(`The weather in ${response.data[0].nombre} this week:`));
 
         const predicction = response.data[0].prediccion;
@@ -171,7 +169,6 @@ async function getData(currentUser)
 // Easy way of displaying weather data in prompt
 async function logWeather(weatherData)
 {
-    console.clear();
     weatherData.forEach(info =>
       {
           console.log(`

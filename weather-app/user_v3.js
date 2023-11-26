@@ -307,10 +307,6 @@ async function goBack (currentUser)
             name: 'choice',
             message: chalk.yellow('Select an option:\n'),
             choices: [ 'Search another city weather', 'Go back to main menu', 'See my search history'],
-            //validate: function (choice)
-            //{
-            //    return choice === 'Search another city weather' || choice === 'Go back to main menu' ? true : console.log('You must chose one option');
-            //}
     }])
 
     if(choice === 'Search another city weather')
@@ -338,7 +334,6 @@ async function userMainMenuHandler(choice)
             break;
     
         case 'history':
-            console.clear();
             await showSearchHistoryLogic(currentUser);
             await goBack(currentUser);
             break;  
