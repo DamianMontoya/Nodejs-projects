@@ -94,7 +94,6 @@ async function getApiUrlResponse (codMunicipio)
     });
 };
 
-// Req of a 
 async function getWeather (url)
 {
     try
@@ -181,13 +180,3 @@ async function logWeather(weatherData)
 };
 
 export {getData, askCity, getApiUrlResponse, getWeather, logWeather,checkCityExistsDatabase }
-
-/* esta maneja toda la logica paso por paso:
-    - pregunta por ciudad y retorna el nombre
-    - query al CityModel pasandole el nombre, devuelve codigo municipio
-    - se pasa el cod a responseDataURL que devuelve una URL con la prediccion
-    - se hace la peticion a la URL de arriba y devuelve un objeto con la info basica
-    - inserta la busqueda en el historial
-
-  promise.all => array promises resueltas.
-*/

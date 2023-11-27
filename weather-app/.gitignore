@@ -6,6 +6,6 @@ dev_v4
 tests
 helpers/old-weather-control.js
 old-weather-control
-models/CCAA.js
+CCAA.js
 aemet_water.js
-./data_city/ccaa.json
+ccaa.json

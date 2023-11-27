@@ -1,3 +1,4 @@
+/// IGNORE THIS FILE AS IT BEING BUILD
 import {showAllCities} from './models/City.js'
 import http from 'http';
 import { connectDB } from './helpers/database-moongose.js';
@@ -111,8 +112,8 @@ async function cruzaLosDedos() {
     }
   }
   
-// this next func was done by GPT 
-async function compareTemperatures() {
+async function compareTemperatures() 
+{
     try {
       await connectDB();
       const cityWeatherData = await cruzaLosDedos();
