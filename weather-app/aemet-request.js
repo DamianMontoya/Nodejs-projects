@@ -12,7 +12,6 @@ import { userMainMenuHandler } from  './user_v3.js';
 // Ask city to the user and returns it 
 async function askCity ()
 {
-    console.clear();
     const {city} = await inquirer.prompt
     ({
         type: 'input', 
@@ -176,7 +175,7 @@ async function logWeather(weatherData)
                        Max temperature: ${info.maxTemperature}ºC
                        Min temperature: ${info.minTemperature}ºC
                        Humidity: ${info.humidity}%
-                       Sky descriptione: ${info.skyDescription}
+                       Sky condition: ${info.skyDescription}
                       `)
       });
 };

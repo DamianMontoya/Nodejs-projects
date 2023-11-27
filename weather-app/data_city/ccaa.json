@@ -1,0 +1,72 @@
+[
+    { 
+        "cod_ccaa": "and", 
+        "nombre": "Andalucía" 
+    },
+    { 
+        "cod_ccaa": "arn", 
+        "nombre": "Aragón" 
+    },
+    { 
+        "cod_ccaa": "ast", 
+        "nombre": "Asturias" 
+    },
+    { 
+        "cod_ccaa": "bal", 
+        "nombre": "Illes Ballears" 
+    },
+    { 
+        "cod_ccaa": "coo", 
+        "nombre": "Canarias" 
+    },
+    { 
+
+        "cod_ccaa": "can", 
+        "nombre": "Cantabria" 
+    },
+    { 
+        "cod_ccaa": "cle", 
+        "nombre": "Castilla y León" 
+    },
+    { 
+        "cod_ccaa": "clm", 
+        "nombre": "Castilla - La Mancha" 
+    },
+    { 
+        "cod_ccaa": "cat", 
+        "nombre": "Cataluña" 
+    },
+    { 
+        "cod_ccaa": "val", 
+        "nombre": "Comunitat Valenciana" 
+    },
+    { 
+        "cod_ccaa": "ext", 
+        "nombre": "Extremadura" 
+    },
+    { 
+        "cod_ccaa": "gal", 
+        "nombre": "Galicia" 
+    },
+    { 
+        "cod_ccaa": "mad", 
+        "nombre": "Madrid, Comunidad de" 
+    },
+    { 
+        "cod_ccaa": "mur", 
+        "nombre": "Región de Murcia" 
+    },
+    { 
+        "cod_ccaa": "nav", 
+        "nombre": "Comunidad Foral de Navarra" 
+    },
+    { 
+        "cod_ccaa": "pva", 
+        "nombre": "País Vasco" 
+    },
+    { 
+        "cod_ccaa": "rio", 
+        "nombre": "La Rioja" 
+    }
+]
+  

@@ -15,4 +15,4 @@ await logInSignUp();
 
 // 3 - Menu principal, a partir de aqui el programa corre 
 //     hasta que el usuario escoga la opcion exit
-await showUserMainMenu();
+//await showUserMainMenu();

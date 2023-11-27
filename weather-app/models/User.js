@@ -5,7 +5,7 @@ import inquirer from 'inquirer';
 import chalk from 'chalk';
 import bcrypt from 'bcrypt';
 
-// EL ESQUEMA DEL USUARIOW
+// user schema
 const userSchema = mongoose.Schema(
     {
         userName: 
@@ -40,7 +40,7 @@ const userSchema = mongoose.Schema(
     }
 );
 
-// EL MODELO DEL USUARIO
+// User Model
 const UserModel = mongoose.model('User', userSchema);
 
 async function createUser(newUserName, newPassword, newEmail)
@@ -58,7 +58,7 @@ async function createUser(newUserName, newPassword, newEmail)
     await user.save();
 };
 
-// RETORNA UN OBJETO DE USUARIO BUSCANDO POR EMAIL
+// returns a object of user if the given email is database
 async function findUserByEmail(UserEmail)
 {
     try
@@ -73,7 +73,7 @@ async function findUserByEmail(UserEmail)
         return false;
     }
 };
-// RETORNA UN TRUE SI EMAIL REGISTRADO, FALSE DE LO CONTRARIO 
+// returns true if email is registered, false if not
 async function userEmailIsRegisred(UserEmail)
 {
     try
@@ -87,8 +87,8 @@ async function userEmailIsRegisred(UserEmail)
         return false;
     }
 };
-//RETORNA EL LISTADO DE TODOS LOS USUARIOS
 
+// returns all the docs of users if needed
 async function findAllUsers()
 {
     const userList = await UserModel.find({});
@@ -96,7 +96,7 @@ async function findAllUsers()
     return userList;
 };
 
-// TE DEVULEVE LA INFO DEL USUARIO PARA CUANDO QUIERA CAMBIARLA
+// given the the user email it returns its userName, password and email
 async function findUserInfo(userEmail)
 {
     const {userName, password, email} = await findUserByEmail(userEmail);
@@ -104,24 +104,26 @@ async function findUserInfo(userEmail)
     return {userName, password, email};
 };
 
-// ACTUALIZA LO QUE QUIERA
-
+// updates the email 
 async function updateUserEmail(id, newEmail)
 {
     await UserModel.findOneAndUpdate(id, {email: newEmail});
 };
 
+// updates the userName
 async function updateUserName(id, newUserName)
 {
     await UserModel.findOneAndUpdate(id, {userName: newUserName});
 };
 
+// updates the password
 async function updateUserPassword(id, newPassword)
 {
     const cryptedPassword = await bcrypt.hash(newPassword, 10);
     await UserModel.findOneAndUpdate(id, {password: cryptedPassword});
 };
 
+// finds in database by ID and returns the user as object
 async function findUserById(id)
 {
     try
@@ -135,11 +137,13 @@ async function findUserById(id)
     }
 };
 
+// deletes the user
 async function deleteUser(id)
 {
     await UserModel.findByIdAndDelete(id);
 };
 
+// deletes all users if needed
 async function deleteAllUsers()
 {
     try
@@ -152,6 +156,7 @@ async function deleteAllUsers()
     }
 };
 
+// inserts in user history database the new search of a user
 async function insertHistoryDB(currentUser, newHistoryInsert)
 {
     try
@@ -174,6 +179,7 @@ async function insertHistoryDB(currentUser, newHistoryInsert)
     }
 };
 
+// returns the history search of a given User
 async function userSearchHistory(currentUser) 
 {
     try 

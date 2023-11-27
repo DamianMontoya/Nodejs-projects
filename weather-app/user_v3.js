@@ -12,12 +12,14 @@ async function logInSignUp ()
 
     console.log(chalk.bgGreen('-------------WELCOME TO MY HUMBLE WEATHER APP-------------'));
 
-    const signInSignUp = await inquirer.prompt([
+    const {choice} = await inquirer.prompt([
         {
             type: 'list',
             name: 'choice',
             message: chalk.yellow('Select an option:\n'),
-            choices: [ 'Log in', 'Sign up'],
+            choices: [ 
+                {value: 'Log in', name: chalk.cyan('Log in')},
+                {value: 'Sign up', name: chalk.cyan('Sign up')}],
             validate: function (choice)
             {
                 return choice === 'Log in' || choice === 'Sign up' ? true : console.log('You must chose one option');
@@ -25,7 +27,7 @@ async function logInSignUp ()
         },
       ])
       console.clear();
-      signInSignUp.choice === 'Log in' ? await logIn() : await signUp(); 
+      choice === 'Log in' ? await logIn() : await signUp(); 
 };
 // manejo de errores en log in, si fallas tres veces te da opcion de volver al signUp
 async function logInAttempts ()
@@ -87,6 +89,7 @@ async function validateUser (currentUser, password)
         if(passwordsMatch)
         {
         console.log('Welcome ', currentUser.userName);
+        await showUserMainMenu()
         }
         else
         {
@@ -94,8 +97,7 @@ async function validateUser (currentUser, password)
             console.clear();
             console.log('Incorrect password...')
             await logIn(); 
-        }
-        
+        }    
     }
     else
     {
@@ -254,6 +256,7 @@ async function userCreateHandleError (userName, email, password)
     {
         await createUser(userName, password, email);
         console.clear();
+        console.log(chalk.green('User saved correctly!'));
         await logIn();
     }
     else
@@ -306,14 +309,17 @@ async function goBack (currentUser)
             type: 'list',
             name: 'choice',
             message: chalk.yellow('Select an option:\n'),
-            choices: [ 'Search another city weather', 'Go back to main menu', 'See my search history'],
+            choices: [ 
+                { value: 'weather', name: chalk.cyan('Search the weather of a city') },
+                { value: 'menu', name: chalk.cyan('Go back to main menu') },
+                { value: 'history', name: chalk.cyan('See my search history') }],
     }])
-
-    if(choice === 'Search another city weather')
+    console.clear();
+    if(choice === 'weather')
     {
         await userMainMenuHandler('weather');
     }
-    else if(choice === 'Go back to main menu')
+    else if(choice === 'menu')
     {
         await showUserMainMenu();
     }
@@ -328,6 +334,7 @@ async function userMainMenuHandler(choice)
     switch (choice) 
     {
         case 'weather':
+            console.clear();
             const data = await getData(currentUser);
             await logWeather(data);
             await goBack(currentUser);
@@ -379,7 +386,7 @@ async function userProfileMenuHandler(choice)
     switch (choice) 
     {
     case 'ChangePassword':
-        console.clear(); // <= comprobar el clear console y compararlo con changeEmail de abajo
+        console.clear();
         await changePassword();
         break;
 
@@ -433,12 +440,15 @@ async function changePassword ()
         const newPassword  = await changePasswordPrompt();
         //update the new password and updates globally user
         await updatePassword(newPassword);
+        console.log(chalk.green('New password saved correctly!\n'))
+        // waits 1,5 secs so the user can see the log 
+        await new Promise(resolve => setTimeout(resolve, 1500));
         // goes to profile menu
         await showUserProfileMenu();
     }
     catch
     {
-        console.log('Error changing the password...');
+        console.log('The password could not be updated, please try again');
         await showUserProfileMenu();
     }
 };
@@ -551,7 +561,8 @@ async function deleteUserPromptHandler(deleteConfirmation)
     {
         await deleteUser(currentUser._id);
         currentUser = null;
-        console.log(chalk.red('Your profile has been deleted')); //esto no se llega a ver porque en logInSignUp hay un clear()
+        console.log(chalk.red('Your profile has been deleted')); 
+        await new Promise(resolve => setTimeout(resolve, 1500));
         await logInSignUp();
     }
     else

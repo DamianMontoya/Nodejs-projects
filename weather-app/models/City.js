@@ -29,7 +29,7 @@ async function findCityCodByName(cityName)
     }
 };
 
-// otra manera mas simple de encontrar el id por nombre
+// returns true if a given city name is in database, false otherwise
 async function cityIsInDatabase(cityName) 
 {
     const findedCity = await CityModel.findOne({ nombre: cityName });
@@ -50,21 +50,6 @@ async function showAllCities()
             pruebita.push({cod_mun : city.cod_mun, nombre : city.nombre});
         })
     return pruebita;
-};
-
-async function insertCitiesDB (path)
-{
-    try
-    {
-        const cityData = fs.readFileSync(path);
-        const siudades =JSON.parse(cityData)
-        await CityModel.insertMany(siudades)
-        console.log('FETEEEEEEEEEEEEEEEEN AL FIN')
-    }
-    catch(error)
-    {
-        console.log('PETARDAZOOOOOOOOOOO',error);
-    }
 };
 
 
@@ -95,8 +80,3 @@ async function getSuggestions(input)
 
 
 export { CityModel, findCityCodByName, cityIsInDatabase, loadCityData, getSuggestions, showAllCities }
-
-// DUDA: habría que cargar las ciudades en la base de datos la primera vez 
-// que se arranca en local? 
-// Descomenta esto para añadir las ciudades a la base de datos la primera vez
-//loadCityData('./data_city/municipios.json')
