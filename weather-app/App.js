@@ -3,16 +3,18 @@ import inquirer from 'inquirer';
 import chalk from 'chalk';
 import axios from 'axios';
 import dotenv from 'dotenv';
-import { connectDB } from './helpers/database-moongose.js';
-import { logInSignUp, showUserMainMenu} from './user_v3.js'
+import { connectDB } from './src/helpers/database-moongose.js';
+import { logInSignUp, showUserMainMenu} from './src/app_logic.js'
+import { loadCityData } from './src/models/City.js';
 
 
-// 1- Conexion BBDD
+// 1-  DB connection
 await connectDB();
 
-// 2- Login o registro
+// 2- Loads the cities into database only the first time you run the App
+await loadCityData('./src/data_city/municipios.json');
+
+// 3- Login o Sign Up
 await logInSignUp();
 
-// 3 - Menu principal, a partir de aqui el programa corre 
-//     hasta que el usuario escoga la opcion exit
-//await showUserMainMenu();
+// 3 - await showUserMainMenu();

@@ -5,7 +5,7 @@ import {findCityCodByName, cityIsInDatabase, getSuggestions}  from './models/Cit
 import inquirer from 'inquirer';
 import chalk from 'chalk';
 import { insertHistoryDB } from './models/User.js';
-import { userMainMenuHandler } from  './user_v3.js';
+import { userMainMenuHandler } from  './app_logic.js';
 
 
 

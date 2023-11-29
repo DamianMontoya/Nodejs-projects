@@ -1,11 +1,30 @@
-node_modules
+# Ignore node_modules
+node_modules/
+
+# Ignore environment file
 .env
-old_dev
-dev_v4
-.vscode
-tests
+
+# Ignore old_dev and dev_v4 directories
+old_dev/
+dev_v4/
+
+# Ignore Visual Studio Code settings
+.vscode/
+
+# Ignore test files
+tests/
+
+# Ignore specific files in the helpers directory
 helpers/old-weather-control.js
-old-weather-control
+helpers/old-weather-control
+
+# Ignore specific files in the root directory
 CCAA.js
 aemet_water.js
-ccaa.json
+
+# Ignore specific files in the src directory
+src/hotest_city.js
+
+# Ignore specific files in the models directory
+src/models/City.js
+src/models/User.js

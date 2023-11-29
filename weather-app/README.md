@@ -12,7 +12,10 @@ Features
 - City suggestions based on user input quering the database.
 
 Set up:
-- MongoDB Connection: set the 'DATABASE_URI' in .env file to your MongoDB connection string like this: DATABASE_URI=mongodb://<username>:<password>@<host>:<port>/<database-name>
+- MongoDB Connection: Set the 'DATABASE_URI' in the .env file in the root of the project to your MongoDB connection string. Replace `<username>`, `<password>`, `<host>`, `<port>`, and `<database-name>` with your actual MongoDB credentials. 
+```env
+DATABASE_URI=mongodb://<username>:<password>@<host>:<port>/<database-name>
+
 - AEMET API KEY: get the api key in the AEMET website: https://shorturl.at/txL05 and paste it to AEMET_KEY variable in .env file.
 
 
