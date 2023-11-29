@@ -1,0 +1,37 @@
+{
+  "name": "url-shortener",
+  "version": "1.0.0",
+  "description": "simple url shortener ussing axios, express and nodejs",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "watch": "nodemon server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DamianMontoya/Nodejs-projects.git"
+  },
+  "keywords": [
+    "Nodejs",
+    "javascript",
+    "axios",
+    "express",
+    "url-shortener"
+  ],
+  "author": "Damian Montoya",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/DamianMontoya/Nodejs-projects/issues"
+  },
+  "homepage": "https://github.com/DamianMontoya/Nodejs-projects#readme",
+  "dependencies": {
+    "axios": "^1.6.2",
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "nanoid": "^3.1.24"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
+}
