@@ -16,6 +16,6 @@
   "author": "Damian Montoya",
   "license": "MIT",
   "dependencies": {
-    "axios": "^1.6.1"
+    "axios": "^1.6.3"
   }
 }
